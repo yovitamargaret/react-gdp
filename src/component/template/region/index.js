@@ -3,6 +3,9 @@ import axios from "axios"
 import { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 
 let Region = () =>{
     const [ data, setData] = useState([{}]);
@@ -47,12 +50,10 @@ let Region = () =>{
             data:JSON.stringify(data)
         }).then((response)=>{
             if(response.data.status === 200){
-                setStatus(true)
+                setStatus(!status)
             }
         }).catch((error)=> {
             console.log(error)
-        }).finally(()=>{
-            setStatus(false)
         })
     }
 
@@ -63,21 +64,36 @@ let Region = () =>{
         handleShow();
     }
 
-    const Delete = (id) =>{
-        axios({
-            method : "DELETE",
-            headers: {
-                'Content-Type' : 'application/json',
-            },
-            url: `http://localhost:8088/api/region/${id}`,
-            }).then((response) => {
-                if(response.data.status === 200){
-                    setStatus(true);
-                }
-            }).catch((error) => {
-                console.log(error);
-            })
+const Delete = (id) => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios({
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        url: `http://localhost:8088/api/region/${id}`,
+      })
+        .then((response) => {
+          if (response.data.status === 200) {
+            setStatus(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
+  });
+};
+
 
 
     return(
